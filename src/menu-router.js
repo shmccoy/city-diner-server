@@ -1,46 +1,106 @@
+const path = require('path')
 const express = require("express");
 const xss = require('xss')
 const MenuService = require("./menu-service");
 
-const MenuService = express.Router();
-const bodyParser = express.json();
+const menuRouter = express.Router();
+const jsonParser = express.json()
 
 const serializeMenu = menu => ({
   id: menu.id,
-  name: menu.name,
-  description: menu.description,
-  price: Number(menu.price),
+  name: xss(menu.name),
+  description: xss(menu.description),
+  price: menu.price,
   category: menu.category
-});
+})
+
 
 menuRouter
-  .route("/menu")
+  .route('/menu')
   .get((req, res, next) => {
-    MenuService.getAllMenu(req.app.get("db"))
+    menuService.getAllMenu(req.app.get('db'))
       .then(menu => {
-        res.json(menu.map(serializeMenu));
+        res.json(menus.map(serializeMenu))
       })
-      .catch(next);
+      .catch(next)
   })
-  .post(bodyParser, (req, res) => {
-    for (const field of ["name", "price", "category"]) {
-      if (!req.body[field]) {
-        return res.status(400).json({
-          error: { message: `Missing '${field}' in request body` }
-        });
-      }
-    }
-  });
+  .post(jsonParser, (req, res, next) => {
+    const { name, description, price, category } = req.body
+    const newMenu = { name, description, price, category }
 
-menuRouter
-  .route('/:menu_id')
-  .get((req, res, next) => {
-    const knexInstance = req.app.get('db')
-    MenuService.getById(knexInstance, req.params.menu_id)
+    for (const [key, value] of Object.entries(newMenu))
+      if (value == null)
+        return res.status(400).json({
+          error: { message: `Missing '${key}' in request body` }
+        })
+
+    
+
+    MenuService.insertMenu(
+      req.app.get('db'),
+      newMenu
+    )
       .then(menu => {
-        if (!item) {
+        res
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${menu.id}`))
+          .json(serializeMenu(menu))
+      })
+      .catch(next)
+  })
+
+  menuRouter
+  .route('/:menu_id')
+  .all((req, res, next) => {
+    MenuService.getById(
+      req.app.get('db'),
+      req.params.menu_id
+    )
+      .then(menu => {
+        if (!menu) {
           return res.status(404).json({
-            error: { message: `Item doesn't exist` }
+            error: { message: `Menu doesn't exist` }
           })
         }
-        res.json({})  
+        res.menu = menu
+        next()
+      })
+      .catch(next)
+  })
+  .get((req, res, next) => {
+    res.json(serializeMenu(res.menu))
+  })
+  .delete((req, res, next) => {
+    MenuService.deleteMenu(
+      req.app.get('db'),
+      req.params.menu_id
+    )
+      .then(numRowsAffected => {
+        res.status(204).end()
+      })
+      .catch(next)
+  })
+  .patch(jsonParser, (req, res, next) => {
+    const { name, description, price, category } = req.body
+    const menuToUpdate = { name, description, price, category }
+
+    const numberOfValues = Object.values(menuToUpdate).filter(Boolean).length
+    if (numberOfValues === 0)
+      return res.status(400).json({
+        error: {
+          message: `Request body must contain either 'content' or 'modified'`
+        }
+      })
+
+    MenuService.updatemenu(
+      req.app.get('db'),
+      req.params.menu_id,
+      menuToUpdate
+    )
+      .then(numRowsAffected => {
+        res.status(204).end()
+      })
+      .catch(next)
+  })
+
+  module.exports = menuRouter
