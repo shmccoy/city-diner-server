@@ -72,41 +72,42 @@ function makeMenuFixtures() {
 }
   
 function cleanTables(db) {
-    return db.raw(
+    return db.transaction(trx =>
+      trx.raw(
       `TRUNCATE
         menu,
         auth_user
         RESTART IDENTITY CASCADE`
-    )
-    .then(() =>
+    ))
+    /*.then(() =>
       Promise.all([
         trx.raw(`ALTER SEQUENCE menu_id_seq minvalue 0 START WITH 1`),
         trx.raw(`ALTER SEQUENCE auth_user_id_seq minvalue 0 START WITH 1`),
         trx.raw(`SELECT setval('menu_id_seq', 0)`),
         trx.raw(`SELECT setval('auth_user_id_seq', 0)`),
       ])
-    )
+    )*/
 }
 
 function seedUsers(db, auth_user) {
   const preppedUsers = auth_user.map(user => ({
-    ...user,
-    password: bcrypt.hashSync(user.password, 1)
+    ...auth_user,
+    password: bcrypt.hashSync(auth_user.password, 1)
   }))
   return db.into('auth_user').insert(preppedUsers)
     .then(() =>
     db.raw(
-      `SELECT setval('blogful_users_id_seq', ?)`,
+      `SELECT setval('auth_user_id_seq', ?)`,
       [auth_user[auth_user.length - 1].id], 
     ))
 }
 
 function seedMenuTable(db, menu) {
   return db.transaction(async trx => {
-    await trx.into('menu').insert(articles)
+    await trx.into('menu').insert(menu)
     await trx.raw(
       `SELECT setval('menu_id_seq', ?)`,
-      [articles[articles.length - 1].id],
+      [menu[menu.length - 1].id],
     )
   })
 }  
@@ -121,6 +122,14 @@ function seedMaliciousMenu(db, menu) {
           .insert([menu])
       )
 }
+
+function makeAuthHeader(auth_user, secret = process.env.JWT_SECRET) {
+  const token = jwt.sign({ user_id: user.id }, secret, {
+    subject: user.user_name,
+    algorithm: 'HS256',
+  })
+  return `Bearer ${token}`  
+}
   
 module.exports = {
   makeMenuArray,
@@ -131,5 +140,7 @@ module.exports = {
   cleanTables,
   seedMenuTable,
   seedMaliciousMenu,
+  makeAuthHeader,
+  seedUsers,
 }
 

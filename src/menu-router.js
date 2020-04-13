@@ -16,11 +16,11 @@ const serializeMenu = menu => ({
 
 
 menuRouter
-  .route('/menu')
+  .route('/')
   .get((req, res, next) => {
-    menuService.getAllMenu(req.app.get('db'))
+    MenuService.getAllMenu(req.app.get('db'))
       .then(menu => {
-        res.json(menus.map(serializeMenu))
+        res.json(menu.map(serializeMenu))
       })
       .catch(next)
   })

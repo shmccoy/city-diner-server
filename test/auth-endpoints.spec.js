@@ -6,8 +6,8 @@ const helpers = require('./test-helpers')
 describe.only('Auth Endpoints', function() {
   let db
 
-  const { testUsers } = helpers.makeArticlesFixtures()
-  const testUser = testUsers[0]
+  const { testMenu } = helpers.makeMenuFixtures()
+  const testUser = testMenu[0]
 
   before('make knex instance', () => {
     db = knex({
@@ -23,11 +23,11 @@ describe.only('Auth Endpoints', function() {
 
   afterEach('cleanup', () => helpers.cleanTables(db))
 
-  describe(`POST /api/auth/admin`, () => {
+  describe(`POST /admin`, () => {
     beforeEach('insert users', () =>
       helpers.seedUsers(
         db,
-        testUsers,
+        testMenu,
       )
     )
 
@@ -43,7 +43,7 @@ describe.only('Auth Endpoints', function() {
             delete loginAttemptBody[field]
             
             return supertest(app)
-            .post('/api/auth/admin')
+            .post('/admin')
             .send(loginAttemptBody)
             .expect(400, {
                 error: `Missing '${field}' in request body`, 
@@ -53,7 +53,7 @@ describe.only('Auth Endpoints', function() {
         it(`responds 400 'invalid user_name or password' when bad user_name`, () => {
             const userInvalidUser = { user_name: 'user-not', password: 'existy' }
             return supertest(app)
-            .post('/api/auth/admin')
+            .post('/admin')
             .send(userInvalidUser)
             .expect(400, { error: `Incorrect user_name or password` })
         })
@@ -61,7 +61,7 @@ describe.only('Auth Endpoints', function() {
         it(`responds 400 'invalid user_name or password' when bad password`, () => {
             const userInvalidPass = { user_name: testUser.user_name, password: 'incorrect' }
             return supertest(app)
-            .post('/api/auth/admin')
+            .post('/admin')
             .send(userInvalidPass)
             .expect(400, { error: `Incorrect user_name or password` })
         })
@@ -76,11 +76,12 @@ describe.only('Auth Endpoints', function() {
               process.env.JWT_SECRET,
               {
                 subject: testUser.user_name,
+                expiresIn: process.env.JWT_EXPIRY,
                 algorithm: 'HS256',
               }
             )
             return supertest(app)
-              .post('/api/auth/admin')
+              .post('/admin/refresh')
               .send(userValidCreds)
               .expect(200, {
                 authToken: expectedToken,

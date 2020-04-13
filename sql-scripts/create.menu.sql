@@ -27,3 +27,5 @@ CREATE TABLE IF NOT EXISTS auth_user (
     password TEXT NOT NULL
     
 );
+
+

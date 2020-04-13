@@ -20,7 +20,7 @@ app
   //.use(validateBearerToken)
   .use(express.json())
   .use('/menu', menuRouter)
-  .use('/auth', authRouter)
+  .use('/admin', authRouter)
 
 app.get('/', (req, res) => {
   res.send('Hello, world!')
