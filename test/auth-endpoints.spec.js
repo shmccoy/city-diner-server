@@ -7,12 +7,12 @@ describe.only('Auth Endpoints', function() {
   let db
 
   const { testMenu } = helpers.makeMenuFixtures()
-  const testUser = testMenu[0]
+  const testUser = helpers.makeUserArray()
 
   before('make knex instance', () => {
     db = knex({
       client: 'pg',
-      connection: process.env.TEST_DB_URL,
+      connection: process.env.TEST_DATABASE_URL,
     })
     app.set('db', db)
   })
@@ -27,7 +27,7 @@ describe.only('Auth Endpoints', function() {
     beforeEach('insert users', () =>
       helpers.seedUsers(
         db,
-        testMenu,
+        testUser,
       )
     )
 

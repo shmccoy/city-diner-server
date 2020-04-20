@@ -1,5 +1,15 @@
 const bcrypt = require('bcryptjs')
 
+function makeUserArray() {
+  return [
+    {
+      id: 1,
+      user_name: 'manger',
+      password: 'password',
+    }
+  ]
+}
+
 function makeMenuArray() {
     return [
       {
@@ -91,8 +101,8 @@ function cleanTables(db) {
 
 function seedUsers(db, auth_user) {
   const preppedUsers = auth_user.map(user => ({
-    ...auth_user,
-    password: bcrypt.hashSync(auth_user.password, 1)
+    ...user,
+    password: bcrypt.hashSync(user.password, 1)
   }))
   return db.into('auth_user').insert(preppedUsers)
     .then(() =>
@@ -132,6 +142,7 @@ function makeAuthHeader(auth_user, secret = process.env.JWT_SECRET) {
 }
   
 module.exports = {
+  makeUserArray,
   makeMenuArray,
   makeExpectedMenu,
   makeMaliciousMenu,
