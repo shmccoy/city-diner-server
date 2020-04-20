@@ -6,7 +6,7 @@ const authRouter = express.Router()
 const jsonBodyParser = express.json()
 
 authRouter
-  .post('/admin', jsonBodyParser, (req, res, next) => {
+  .post('/', jsonBodyParser, (req, res, next) => {
     const { user_name, password } = req.body
     const loginUser = { user_name, password }
     
@@ -41,7 +41,7 @@ authRouter
         })
        
         })
-        //.catch(next)
+        .catch(next)
     })      
     
     authRouter.post('/refresh', requireAuth, (req, res) => {
