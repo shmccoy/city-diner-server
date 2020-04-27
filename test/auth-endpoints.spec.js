@@ -35,13 +35,13 @@ describe.only('Auth Endpoints', function() {
 
     requiredFields.forEach(field => {
         const loginAttemptBody = {
-            user_name: testUser.user_name,
-            password: testUser.password,
+            user_name: testUser[0].user_name,
+            password: testUser[0].password,
         }
         
         it(`responds with 400 required error when '${field}' is missing`, () => {
             delete loginAttemptBody[field]
-            
+            console.log([field, loginAttemptBody])
             return supertest(app)
             .post('/admin')
             .send(loginAttemptBody)
@@ -59,7 +59,7 @@ describe.only('Auth Endpoints', function() {
         })
         
         it(`responds 400 'invalid user_name or password' when bad password`, () => {
-            const userInvalidPass = { user_name: testUser.user_name, password: 'incorrect' }
+            const userInvalidPass = { user_name: testUser[0].user_name, password: 'incorrect' }
             return supertest(app)
             .post('/admin')
             .send(userInvalidPass)
@@ -68,14 +68,14 @@ describe.only('Auth Endpoints', function() {
         
         it(`responds 200 and JWT auth token using secret when valid credentials`, () => {
             const userValidCreds = {
-              user_name: testUser.user_name,
-              password: testUser.password,
+              user_name: testUser[0].user_name,
+              password: testUser[0].password,
             }
             const expectedToken = jwt.sign(
-              { user_id: testUser.id }, // payload
+              { user_name: testUser[0].user_name }, // payload
               process.env.JWT_SECRET,
               {
-                subject: testUser.user_name,
+                subject: testUser[0].user_name,
                 expiresIn: process.env.JWT_EXPIRY,
                 algorithm: 'HS256',
               }

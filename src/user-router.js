@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 
 const validateBearerToken = require('./validate-bearer-token');
 
-module.exports = (app) => {
+module.exports = userRouter => {
 
     app.use(validateBearerToken)
     app.post('/admin', (req, res, next) => {

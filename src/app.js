@@ -4,9 +4,10 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV, API_TOKEN } = require('./config')
-//const validateBearerToken = require('./validate-bearer-token')
+const validateBearerToken = require('./validate-bearer-token')
 const menuRouter = require('./menu-router')
 const authRouter = require('./auth/auth-router')
+const userRouter = require('./user-router')
 
 
 const app = express()
@@ -19,8 +20,9 @@ app
   .use(cors())
   //.use(validateBearerToken)
   .use(express.json())
+  //.use(user_router)
   .use('/menu', menuRouter)
-  .use('/admin', authRouter)
+  .use('/admin', authRouter, userRouter)
 
 app.get('/', (req, res) => {
   res.send('Hello, world!')
