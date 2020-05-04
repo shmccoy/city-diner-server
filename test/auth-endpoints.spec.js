@@ -72,7 +72,7 @@ describe.only('Auth Endpoints', function() {
               password: testUser[0].password,
             }
             const expectedToken = jwt.sign(
-              { user_name: testUser[0].user_name }, // payload
+              testUser[0].user_name, // payload
               process.env.JWT_SECRET,
               {
                 subject: testUser[0].user_name,

@@ -6,7 +6,7 @@ const authRouter = express.Router()
 const jsonBodyParser = express.json()
 
 authRouter
-  .post('/', jsonBodyParser, (req, res, next) => {
+  .post('/admin', jsonBodyParser, (req, res, next) => {
     const { user_name, password } = req.body
     const loginUser = { user_name, password }
     
@@ -34,7 +34,7 @@ authRouter
                     })
 
             const sub = dbUser.user_name
-            const payload = { user_id: dbUser.id }
+            const payload = dbUser.user_name
             res.send({
                 authToken: AuthService.createJwt(sub, payload),
             })

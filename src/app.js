@@ -22,7 +22,7 @@ app
   .use(express.json())
   //.use(user_router)
   .use('/menu', menuRouter)
-  .use('/admin', authRouter, userRouter)
+  .use('/admin', userRouter)
 
 app.get('/', (req, res) => {
   res.send('Hello, world!')
