@@ -1,68 +1,56 @@
-const jwt = require('jsonwebtoken')
-const express = require("express");
+const express = require('express')
+const path = require('path')
+const UserService = require('./user-service')
+
 const userRouter = express.Router()
-const validateBearerToken = require('./validate-bearer-token');
+const jsonBodyParser = express.json()
 
-//Check to make sure header is not undefined, if so, return Forbidden (403)
-const checkToken = (req, res, next) => {
-    const header = req.headers['authorization'];
+userRouter
+  .post('/', jsonBodyParser, (req, res, next) => {
+    const { password, user_name } = req.body
 
-    if(typeof header !== 'undefined') {
-
-        const bearer = header.split(' ');
-        const token = bearer[1];
-
-        req.token = token;
-
-        next();
-    } else {
-        //If header is undefined return Forbidden (403)
-        res.sendStatus(403)
-    }
-}
-
-
-
-    userRouter
-    .use(validateBearerToken)
-    .post('/', (req, res, next) => {
-        const { body } = req;
-        const { username } = body;
-        const { password } = body;
-
-        //checking to make sure the user entered the correct username/password combo
-        if(username === user.user_name && password === user.password) { 
-            //if user log in success, generate a JWT token for the user with a secret key
-            jwt.sign({user}, process.env.JWT_SECRET, { expiresIn: '1h' },(err, token) => {
-                if(err) { console.log(err) }    
-                res.send(token);
-            });
-        } else {
-            console.log('ERROR: Could not log in');
-        }
-    })
-
-    //This is a protected route 
-    .get('/dashboard', checkToken, (req, res) => {
-        //verify the JWT token generated for the user
-        jwt.verify(req.token, process.env.JWT_SECRET, (err, authorizedData) => {
-            if(err){
-                //If error send Forbidden (403)
-                console.log('ERROR: Could not connect to the protected route');
-                res.sendStatus(403);
-            } else {
-                //If token is successfully verified, we can send the autorized data 
-                res.json({
-                    message: 'Successful log in',
-                    authorizedData
-                });
-                console.log('SUCCESS: Connected to protected route');
-            }
+    for (const field of ['user_name', 'password'])
+      if (!req.body[field])
+        return res.status(400).json({
+          error: `Missing '${field}' in request body`
         })
-    });
 
+    // TODO: check user_name doesn't start with spaces
 
+    const passwordError = UserService.validatePassword(password)
 
+    if (passwordError)
+      return res.status(400).json({ error: passwordError })
 
+    UserService.hasUserWithUserName(
+      req.app.get('db'),
+      user_name
+    )
+      .then(hasUserWithUserName => {
+        if (hasUserWithUserName)
+          return res.status(400).json({ error: `Username already taken` })
+
+        return UserService.hashPassword(password)
+          .then(hashedPassword => {
+            const newUser = {
+              user_name,
+              password: hashedPassword,
+              date_created: 'now()',
+            }
+
+            return UserService.insertUser(
+              req.app.get('db'),
+              newUser
+            )
+              .then(user => {
+                res
+                  .status(201)
+                  .location(path.posix.join(req.originalUrl, `/${user.id}`))
+                  .json(UserService.serializeUser(user))
+              })
+          })
+      })
+      .catch(next)
+  })
 
 module.exports = userRouter
