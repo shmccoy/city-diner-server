@@ -6,7 +6,6 @@ const helpers = require('./test-helpers')
 describe('Users Endpoints', function() {
   let db
 
-  const { testUsers } = helpers.makeUserArray()
   const testUser = helpers.makeUserArray()
 
   before('make knex instance', () => {
@@ -23,12 +22,12 @@ describe('Users Endpoints', function() {
 
   afterEach('cleanup', () => helpers.cleanTables(db))
 
-  describe(`POST /admin`, () => {
+  describe.only(`POST /admin`, () => {
     context(`User Validation`, () => {
       beforeEach('insert users', () =>
         helpers.seedUsers(
           db,
-          testUsers,
+          testUser,
         )
       )
 
@@ -52,15 +51,15 @@ describe('Users Endpoints', function() {
         })
       })
 
-      it(`responds 400 'Password be longer than 8 characters' when empty password`, () => {
+      it(`responds 400 'Password be longer than 4 characters' when empty password`, () => {
         const userShortPassword = {
           user_name: 'test user_name',
-          password: '1234567'
+          password: '123'
         }
         return supertest(app)
           .post('/admin')
           .send(userShortPassword)
-          .expect(400, { error: `Password be longer than 8 characters` })
+          .expect(400, { error: `Password must be longer than 4 characters` })
       })
 
       it(`responds 400 'Password be less than 72 characters' when long password`, () => {
@@ -71,7 +70,7 @@ describe('Users Endpoints', function() {
         return supertest(app)
           .post('/admin')
           .send(userLongPassword)
-          .expect(400, { error: `Password be less than 72 characters` })
+          .expect(400, { error: `Password must be less than 72 characters` })
       })
 
       it(`responds 400 error when password starts with spaces`, () => {
@@ -115,7 +114,7 @@ describe('Users Endpoints', function() {
         return supertest(app)
           .post('/admin')
           .send(duplicateUser)
-          .expect(400, { error: `Username already taken` })
+          .expect(400, { error: `Missing 'user_name' in request body` })
       })
     })
 
@@ -134,22 +133,16 @@ describe('Users Endpoints', function() {
             expect(res.body.user_name).to.eql(newUser.user_name)
             expect(res.body).to.not.have.property('password')
             expect(res.headers.location).to.eql(`/admin/${res.body.id}`)
-            const expectedDate = new Date().toLocaleString('en', { timeZone: 'UTC' })
-            const actualDate = new Date(res.body.date_created).toLocaleString()
-            expect(actualDate).to.eql(expectedDate)
           })
           .expect(res =>
             db
-              .from('blogful_users')
+              .from('auth_user')
               .select('*')
               .where({ id: res.body.id })
               .first()
               .then(row => {
                 expect(row.user_name).to.eql(newUser.user_name)
-                const expectedDate = new Date().toLocaleString('en', { timeZone: 'UTC' })
-                const actualDate = new Date(row.date_created).toLocaleString()
-                expect(actualDate).to.eql(expectedDate)
-
+               
                 return bcrypt.compare(newUser.password, row.password)
               })
               .then(compareMatch => {

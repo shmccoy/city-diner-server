@@ -4,8 +4,8 @@ function makeUserArray() {
   return [
     {
       id: 1,
-      user_name: 'manger',
-      password: 'password',
+      user_name: 'Manger',
+      password: 'Password1!',
     }
   ]
 }
