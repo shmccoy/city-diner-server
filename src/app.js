@@ -22,9 +22,9 @@ app
   //.use(validateBearerToken)
   .use(express.json())
   //.use(user_router)
-  .use("/menu", menuRouter)
+  .use("/api/menu", menuRouter)
 
-  .use("/admin", userRouter);
+  .use("/api/admin", userRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, world!");

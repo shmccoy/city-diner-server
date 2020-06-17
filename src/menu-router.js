@@ -6,20 +6,12 @@ const MenuService = require("./menu-service");
 const menuRouter = express.Router();
 const jsonParser = express.json();
 
-const serializeMenu = (menu) => ({
-  id: menu.id,
-  name: xss(menu.name),
-  description: xss(menu.description),
-  price: menu.price,
-  category: menu.category,
-});
-
 menuRouter
   .route("/")
   .get((req, res, next) => {
     MenuService.getAllMenu(req.app.get("db"))
       .then((menu) => {
-        res.json(menu.map(serializeMenu));
+        res.json(menu);
       })
       .catch(next);
   })
@@ -38,7 +30,7 @@ menuRouter
         res
           .status(201)
           .location(path.posix.join(req.originalUrl, `/${menu.id}`))
-          .json(serializeMenu(menu));
+          .json(menu);
       })
       .catch(next);
   });
@@ -49,14 +41,14 @@ menuRouter
   .all((req, res, next) => {
     const { category } = req.params;
     MenuService.getByCategory(req.app.get("db"), category)
-      .then((category) => {
-        if (!category) {
-          logger.error(`No products in category ${category} found.`);
+      .then((result) => {
+        if (!result) {
+          logger.error(`No products in category ${result} found.`);
           return res.status(404).json({
             error: { message: `Category Not Found` },
           });
         }
-        res.category = category;
+        res.category = result;
         next();
       })
       .catch(next);
@@ -82,7 +74,7 @@ menuRouter
       .catch(next);
   })
   .get((req, res, next) => {
-    res.json(serializeMenu(res.menu));
+    res.json(res.menu);
   })
   .delete((req, res, next) => {
     MenuService.deleteMenu(req.app.get("db"), req.params.menu_id)
