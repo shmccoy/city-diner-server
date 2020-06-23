@@ -12,13 +12,14 @@ const userRouter = require("./user-router");
 const app = express();
 
 app
+  .use(cors())
   .use(
     morgan(NODE_ENV === "production" ? "tiny" : "common", {
       skip: () => NODE_ENV === "test",
     })
   )
   .use(helmet())
-  .use(cors())
+
   //.use(validateBearerToken)
   .use(express.json())
   //.use(user_router)
