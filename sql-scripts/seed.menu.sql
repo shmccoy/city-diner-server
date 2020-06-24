@@ -7,7 +7,7 @@ TRUNCATE
 
 INSERT INTO auth_user (user_name, password)
 VALUES
-  ('dinermgr', 'cd2237');  
+  ('dinermgr', 'cD2237!');  
 
 INSERT INTO menu
     (name, description, price, category)
