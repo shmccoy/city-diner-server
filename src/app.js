@@ -12,11 +12,7 @@ const userRouter = require("./user-router");
 const app = express();
 
 app
-  .use(
-    cors({
-      origin: CLIENT_ORIGIN,
-    })
-  )
+  .use(cors())
   .use(
     morgan(NODE_ENV === "production" ? "tiny" : "common", {
       skip: () => NODE_ENV === "test",
@@ -28,6 +24,7 @@ app
   .use(express.json())
   //.use(user_router)
   .use("/api/menu", menuRouter)
+  .use("/api/auth", authRouter)
 
   .use("/api/admin", userRouter);
 
