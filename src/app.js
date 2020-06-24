@@ -12,7 +12,11 @@ const userRouter = require("./user-router");
 const app = express();
 
 app
-  .use(cors())
+  .use(
+    cors({
+      origin: CLIENT_ORIGIN,
+    })
+  )
   .use(
     morgan(NODE_ENV === "production" ? "tiny" : "common", {
       skip: () => NODE_ENV === "test",
