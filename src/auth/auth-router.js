@@ -38,7 +38,10 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
         });
       });
     })
-    .catch(next);
+    .catch((error) => {
+      console.log(error);
+      next(error);
+    });
 });
 
 authRouter.post("/refresh", requireAuth, (req, res) => {
