@@ -1,26 +1,43 @@
-# Express Boilerplate!
+# The Black Market (Server)
 
-This is a boilerplate project used for starting new projects!
+Here is the repository for the The Black Market's back end.
 
-## Set up
+## Heroku URL for Database
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+### URL
 
-1. Clone this repository to your local machine `git clone BOILERPLATE-URL NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+https://powerful-tor-85817.herokuapp.com/
 
-## Scripts
+### Client Code
 
-Start the application `npm start`
+https://github.com/shmccoy/city-diner-client.git
 
-Start nodemon for the application `npm run dev`
+### Endpoints
 
-Run the tests `npm test`
+#### POST /api/auth/login
 
-## Deploying
+##### logs user in to access dashboard
 
-When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's master branch.# city-diner-server
+#### GET api/menu/menu/:category
+
+##### gets menu items by category
+
+#### GET api/menu
+
+##### gets all menu items
+
+#### POST /api/menu
+
+##### adds new item to menu
+
+#### DELETE /api/menu
+
+##### remove item from menu
+
+#### DELETE /api/menu/:menu_id ( = product.id)
+
+##### deletes item from menu
+
+#### PATCH /api/menu
+
+##### updates menu item
