@@ -16,6 +16,40 @@ https://github.com/shmccoy/city-diner-client.git
 
 [City Diner](https://city-diner-client.vercel.app/ "City Diner title")
 
+---
+
+### Description
+
+City Diner is an app for a restaurant that has a content management system for the menu data. City Diner is an actual restaurant in Richmond, Virginia that I frequent. They don't have much of a web presence so I decided to make a web app for them.
+
+---
+
+### Purpose behind City Diner
+
+There would be an app that advertises the restaurant as well as inform customers what is on the menu. Also the manager will have the entire menu on the database, and can make changes as needed.
+
+---
+
+### Tech Stack
+
+Client:
+
+- React
+- JavaScript
+- HTML
+- CSS
+
+Server:
+
+- Node
+- Express
+- PostgreSQL
+- Mocha
+- Chai
+- bcrypt
+
+---
+
 ### Endpoints
 
 #### POST /api/auth/login

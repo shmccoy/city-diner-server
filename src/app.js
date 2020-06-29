@@ -20,9 +20,8 @@ app
   )
   .use(helmet())
 
-  //.use(validateBearerToken)
   .use(express.json())
-  //.use(user_router)
+
   .use("/api/menu", menuRouter)
   .use("/api/auth", authRouter)
 
