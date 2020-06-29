@@ -95,7 +95,7 @@ menuRouter
         },
       });
 
-    MenuService.updatemenu(req.app.get("db"), req.params.menu_id, menuToUpdate)
+    MenuService.updateMenu(req.app.get("db"), req.params.menu_id, menuToUpdate)
       .then((numRowsAffected) => {
         res.status(204).end();
       })
