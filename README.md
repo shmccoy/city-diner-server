@@ -1,6 +1,6 @@
-# The Black Market (Server)
+# City Diner (Server)
 
-Here is the repository for the The Black Market's back end.
+Here is the repository for the City Diner's back end.
 
 ## Heroku URL for Database
 
@@ -11,6 +11,10 @@ https://powerful-tor-85817.herokuapp.com/
 ### Client Code
 
 https://github.com/shmccoy/city-diner-client.git
+
+## Live Client:
+
+[City Diner](https://city-diner-client.vercel.app/ "City Diner title")
 
 ### Endpoints
 

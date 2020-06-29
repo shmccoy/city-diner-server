@@ -19,10 +19,10 @@ const MenuService = {
   getById(knex, id) {
     return knex.from("menu").select("*").where("id", id).first();
   },
-  deleteNote(knex, id) {
+  deleteMenu(knex, id) {
     return knex("menu").where({ id }).delete();
   },
-  updateNote(knex, id, newMenuFields) {
+  updateMenu(knex, id, newMenuFields) {
     return knex("menu").where({ id }).update(newMenuFields);
   },
 };
